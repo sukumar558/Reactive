@@ -71,9 +71,13 @@ export default function MessageHistory() {
 
   const triggerLabels = {
     service_reminder: '🔧 Service',
+    service_due: '🛠️ Service Due',
     upgrade: '🚀 Upgrade',
     upsell: '🛍️ Upsell',
     warranty_expiry: '🛡️ Warranty',
+    reactivation: '👋 Reactivation',
+    vip_offer: '💎 VIP Offer',
+    festival: '🎉 Festival',
     custom: '📝 Custom',
   };
 
@@ -135,18 +139,32 @@ export default function MessageHistory() {
                             📱 {cc.ra_customers?.phone}
                           </span>
                         </div>
-                        <div style={{ display: 'flex', gap: 6 }}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <span className={`badge badge-${
+                            cc.status === 'delivered' ? 'green' : 
+                            cc.status === 'failed' || cc.status === 'permanent_failed' ? 'red' : 
+                            cc.status === 'processing' || cc.status === 'sending' ? 'blue' :
+                            cc.status === 'opted_out' ? 'gray' : 'yellow'
+                          }`}>
+                            {cc.status === 'pending' || cc.status === 'queued' ? '⏳ Queued' : 
+                             cc.status === 'processing' || cc.status === 'sending' ? '⚡ Sending' :
+                             cc.status === 'delivered' ? '✅ Delivered' :
+                             cc.status === 'failed' || cc.status === 'permanent_failed' ? '❌ Failed' :
+                             cc.status === 'opted_out' ? '🚫 Opted Out' : cc.status}
+                          </span>
+                          
                           {cc.is_converted ? (
                             <span className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                              ✅ Converted (₹{cc.sale_value})
+                              💰 Converted (₹{cc.sale_value})
                             </span>
                           ) : (
                             <button className="btn btn-sm btn-primary" onClick={() => markConverted(cc.id, campaign.id)}>
-                              💰 Mark Converted
+                              Track Sale
                             </button>
                           )}
-                          <button className="btn btn-sm btn-success" onClick={() => resendMessage(cc.ra_customers?.phone, cc.personalized_message)}>
-                            <RotateCcw size={12} /> Resend
+                          <button className="btn btn-sm btn-secondary" style={{ padding: '4px 8px' }} 
+                            onClick={() => resendMessage(cc.ra_customers?.phone, cc.personalized_message)}>
+                            <RotateCcw size={12} />
                           </button>
                         </div>
                       </div>

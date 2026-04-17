@@ -24,23 +24,23 @@ export function useApp() {
 
 const aboutContent = (
   <>
-    <p>ReActivate AI is born from a simple observation: <b>Local shop owners in Bharat are losing customers because they simply forget to follow up.</b></p>
-    <p style={{ marginTop: '16px' }}>While big e-commerce players use advanced CRM tools to bomb customers with notifications, local electronics and mobile shops rely on memory or paper diaries.</p>
+    <p>ReActivate AI was born from a simple observation: <b>Local shop owners are losing customers simply because they forget to follow up.</b></p>
+    <p style={{ marginTop: '16px' }}>While large e-commerce players use advanced CRM tools to bombard customers with notifications, local retailers often rely on memory or paper diaries.</p>
     <p style={{ marginTop: '16px' }}>Our mission is to level the playing field. We provide professional-grade CRM tools that are so simple, a shop owner can master them in 5 minutes. No complex APIs, no expensive software—just smart triggers and WhatsApp.</p>
   </>
 );
 
 const visionContent = (
   <>
-    <p>We envision a Bharat where every small retailer is a "Smart Retailer".</p>
+    <p>We envision a future where every small retailer is a "Smart Retailer".</p>
     <div style={{ marginTop: '16px' }}>
-      <b>1. Digital Empowerment:</b> Making AI and Automation accessible to the neighborhood mobile and electronics shops.
+      <b>1. Digital Empowerment:</b> Making AI and Automation accessible to local businesses everywhere.
     </div>
     <div style={{ marginTop: '16px' }}>
-      <b>2. Relationship First:</b> Focus on personal follow-ups via WhatsApp, the most trusted communication channel in Bharat.
+      <b>2. Relationship First:</b> Focus on personal follow-ups via WhatsApp, the most trusted communication channel.
     </div>
     <div style={{ marginTop: '16px' }}>
-      <b>3. Economic Growth:</b> Helping 1 Million+ shop owners increase their repeat business by 30% or more.
+      <b>3. Economic Growth:</b> Helping over 1 million shop owners increase their repeat business by 30% or more.
     </div>
   </>
 );
@@ -91,7 +91,7 @@ function App() {
 
   async function loadCustomers() {
     const { data, error } = await supabase
-      .from('ra_customers')
+      .from('customers')
       .select('*')
       .order('created_at', { ascending: false });
 

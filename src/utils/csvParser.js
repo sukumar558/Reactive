@@ -84,21 +84,25 @@ function parseDate(dateStr) {
 }
 
 /**
- * Auto-detect product category from item name
+ * Auto-detect product category from item name with focus on CRM Campaign Tags
  */
 export function detectCategory(item) {
   const lower = item.toLowerCase();
   
-  if (lower.includes('ac') || lower.includes('air conditioner') || lower.includes('cooler')) return 'AC';
-  if (lower.includes('fridge') || lower.includes('refrigerator')) return 'Fridge';
-  if (lower.includes('tv') || lower.includes('television') || lower.includes('led')) return 'TV';
-  if (lower.includes('washing') || lower.includes('washer')) return 'Washing Machine';
-  if (lower.includes('mobile') || lower.includes('phone') || lower.includes('smartphone')) return 'Mobile';
-  if (lower.includes('laptop') || lower.includes('computer') || lower.includes('pc')) return 'Laptop';
-  if (lower.includes('microwave') || lower.includes('oven')) return 'Microwave';
-  if (lower.includes('geyser') || lower.includes('water heater')) return 'Geyser';
-  if (lower.includes('fan') || lower.includes('ceiling')) return 'Fan';
-  if (lower.includes('printer') || lower.includes('scanner')) return 'Printer';
+  // CRM Campaign Smart Tags
+  if (lower.includes('service') || lower.includes('maintain') || lower.includes('checkup') || lower.includes('repair')) return 'service_due';
+  if (lower.includes('new') || lower.includes('latest') || lower.includes('next') || lower.includes('exchange')) return 'upsell';
+  if (lower.includes('premium') || lower.includes('high') || lower.includes('gold') || lower.includes('max') || lower.includes('pro')) return 'upgrade';
+  if (lower.includes('old') || lower.includes('return') || lower.includes('inactive') || lower.includes('winback')) return 'reactivation';
+  if (lower.includes('vip') || lower.includes('exclusive') || lower.includes('offer') || lower.includes('special') || lower.includes('gift')) return 'vip_offer';
+
+  // Product Fallbacks
+  if (lower.includes('ac') || lower.includes('cooler')) return 'AC';
+  if (lower.includes('fridge')) return 'Fridge';
+  if (lower.includes('tv') || lower.includes('led')) return 'TV';
+  if (lower.includes('wash')) return 'Washing Machine';
+  if (lower.includes('phone') || lower.includes('mobile')) return 'Mobile';
+  if (lower.includes('laptop') || lower.includes('pc')) return 'Laptop';
   
   return 'General';
 }

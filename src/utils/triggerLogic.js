@@ -43,6 +43,38 @@ const TRIGGER_RULES = [
     months: 12,
     color: '#06b6d4',
     description: 'Suggest upgrade for products purchased 12+ months ago'
+  },
+  {
+    type: 'reactivation',
+    label: 'Reactivation',
+    icon: '👋',
+    months: 18,
+    color: '#6366f1',
+    description: 'Re-engage customers after 1.5 years'
+  },
+  {
+    type: 'vip_offer',
+    label: 'VIP Offer',
+    icon: '💎',
+    months: 9,
+    color: '#d946ef',
+    description: 'Exclusive reward for loyal customers'
+  },
+  {
+    type: 'festival',
+    label: 'Festival Special',
+    icon: '🎉',
+    months: 0,
+    color: '#f97316',
+    description: 'Seasonal/Festival greetings and offers'
+  },
+  {
+    type: 'service_due',
+    label: 'Service Due',
+    icon: '🛠️',
+    months: 10,
+    color: '#f59e0b',
+    description: 'Urgent service reminder (10 months)'
   }
 ];
 
@@ -122,6 +154,10 @@ export function analyzeAllCustomers(customers) {
     upsell: [],
     warranty_expiry: [],
     upgrade: [],
+    reactivation: [],
+    vip_offer: [],
+    festival: [],
+    service_due: [],
     all: []
   };
 
@@ -155,6 +191,8 @@ export function getDashboardStats(triggerResults) {
     warrantyCount: triggerResults.warranty_expiry.length,
     upgradeCount: triggerResults.upgrade.length,
     feedbackCount: triggerResults.feedback.length,
+    reactivationCount: triggerResults.reactivation.length,
+    vipCount: triggerResults.vip_offer.length,
     total: triggerResults.all.length
   };
 }

@@ -18,7 +18,7 @@ export default function CustomerList() {
 
   async function handleDelete(id, name) {
     if (!confirm(`Delete ${name}? This cannot be undone.`)) return;
-    const { error } = await supabase.from('ra_customers').delete().eq('id', id);
+    const { error } = await supabase.from('customers').delete().eq('id', id);
     if (error) {
       addToast('Delete failed: ' + error.message, 'error');
     } else {
@@ -33,7 +33,7 @@ export default function CustomerList() {
   }
 
   async function saveEdit() {
-    const { error } = await supabase.from('ra_customers').update(editForm).eq('id', editingId);
+    const { error } = await supabase.from('customers').update(editForm).eq('id', editingId);
     if (error) {
       addToast('Update failed: ' + error.message, 'error');
     } else {

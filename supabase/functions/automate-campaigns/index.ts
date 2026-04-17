@@ -10,8 +10,11 @@ const MILESTONES = [
   { type: 'feedback', days: 15 },
   { type: 'upsell', months: 3 },
   { type: 'service_reminder', months: 6 },
+  { type: 'vip_offer', months: 9 },
+  { type: 'service_due', months: 10 },
   { type: 'warranty_expiry', months: 11 },
-  { type: 'upgrade', months: 12 }
+  { type: 'upgrade', months: 12 },
+  { type: 'reactivation', months: 18 }
 ];
 
 interface Templates {
@@ -26,6 +29,22 @@ const TEMPLATES: Templates = {
   service_reminder: [
     "Namaste {name} ji! 🙏 Aapne 6 mahine pehle {item} liya tha hamare yahan se. Ab service ka time aa gaya hai. Aaj hi slot book karein? 🔧",
     "Hello {name} ji! Aapka {item} ka 6 month service due hai. Expert service se life badhti hai! 🚀 Kab aayen shop pe?"
+  ],
+  service_due: [
+    "Namaste {name} ji! 🙏 Aapke {item} ki urgent service due hai. Aaj hi check karwayein. 🛠️",
+    "Hello {name} ji! Reminder: Aapka {item} service milestone cross kar chuka hai! ✨"
+  ],
+  reactivation: [
+    "Namaste {name} ji! 👋 Bahut time ho gaya aap se mile. Hamare paas {item} के naye models aaye hain. Visit shop! 😊",
+    "Hi {name} ji! We miss you! Aapke liye ek special discount ready hai for your next {item} purchase! 🎁"
+  ],
+  vip_offer: [
+    "Congratulations {name} ji! 🎉 Aap hamare VIP customer hain. Exclusive 20% OFF code: VIP20. 💎",
+    "Namaste {name} ji! Loyal customer priority access for new {item} collection! 🌟"
+  ],
+  festival: [
+    "Smart Choice ki taraf se Happy Festival! 🪔 {item} upgrade pe bumper cashbacks! 🎆",
+    "Happy Festival {name} ji! 🎈 Special seasonal deals on {item}! 🛍️"
   ],
   upsell: [
     "Hi {name} ji! 👋 Aapke {item} ke liye compatible accessories aa gaye hain with amazing quality. ✨ Dekhne aaiye na shop pe? — Smart Choice Mobile",
@@ -101,6 +120,7 @@ serve(async (req: Request) => {
             user_id: profile.id,
             title: campaignTitle,
             trigger_type: 'automation',
+            campaign_type: 'automation',
             status: 'completed'
           })
           .select()
@@ -117,25 +137,20 @@ serve(async (req: Request) => {
             .replace(/{name}/g, customer.name)
             .replace(/{item}/g, customer.item)
 
-          // Meta API call
-          const response = await fetch(
-            `https://graph.facebook.com/v18.0/${profile.whatsapp_phone_id}/messages`,
-            {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${profile.whatsapp_cloud_token}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                messaging_product: "whatsapp",
-                to: customer.phone,
-                type: "text",
-                text: { body },
-              })
-            }
-          )
+          // Insert into Message Queue with campaign/customer links
+          const { error: qError } = await supabaseAdmin
+            .from('message_queue')
+            .insert({
+              user_id: profile.id,
+              campaign_id: (campaign as any).id,
+              customer_id: customer.id,
+              phone: customer.phone,
+              message: body,
+              status: 'pending',
+              scheduled_at: new Date().toISOString()
+            })
 
-          if (response.ok) {
+          if (!qError) {
             totalProcessed.messagesSent++
             // Update customer
             await supabaseAdmin
@@ -147,14 +162,14 @@ serve(async (req: Request) => {
               })
               .eq('id', customer.id)
 
-            // Log for dashboard details
+            // Log for dashboard details (keep status as pending until worker sends it)
             await supabaseAdmin
               .from('ra_campaign_customers')
               .insert({
                 campaign_id: (campaign as any).id,
                 customer_id: customer.id,
                 personalized_message: body,
-                status: 'sent'
+                status: 'pending'
               })
 
             // Log for general message history

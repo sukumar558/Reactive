@@ -120,6 +120,22 @@ export default function Dashboard() {
             <div className="trigger-card-desc">15-day review requests</div>
             <div className="trigger-card-count">{stats.feedbackCount}</div>
           </div>
+
+          <div className="trigger-card" onClick={() => setCurrentPage('triggers')}
+            style={{ borderTop: '2px solid #6366f1' }}>
+            <div className="trigger-card-icon">👋</div>
+            <div className="trigger-card-title">Reactivation</div>
+            <div className="trigger-card-desc">Inactive for 1.5 years</div>
+            <div className="trigger-card-count">{stats.reactivationCount}</div>
+          </div>
+
+          <div className="trigger-card" onClick={() => setCurrentPage('triggers')}
+            style={{ borderTop: '2px solid #d946ef' }}>
+            <div className="trigger-card-icon">💎</div>
+            <div className="trigger-card-title">VIP Offer</div>
+            <div className="trigger-card-desc">High value rewards</div>
+            <div className="trigger-card-count">{stats.vipCount}</div>
+          </div>
         </div>
       </div>
 

@@ -109,6 +109,7 @@ export default function CampaignBuilder() {
           user_id: session.user.id,
           title: campaignTitle,
           trigger_type: triggerType,
+          campaign_type: 'manual',
           message_template: approved[0]?.message?.substring(0, 200),
           status: 'completed',
           total_customers: approved.length,
@@ -153,18 +154,22 @@ export default function CampaignBuilder() {
       if (profile?.api_mode_enabled) {
         addToast('🚀 Sending via Official API...', 'info');
         
-        const payload = {
-          messages: approved.map(m => ({
-            phone: m.customer.phone,
-            body: m.message
-          }))
-        };
-
-        const { data, error: functionError } = await supabase.functions.invoke('send-bulk-campaign', {
-          body: payload
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-bulk-campaign`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+            'x-campaign-id': campaign.id
+          },
+          body: JSON.stringify({
+            messages: approved.map(m => ({
+              phone: m.customer.phone,
+              body: m.message
+            }))
+          })
         });
 
-        if (functionError) throw new Error(functionError.message);
+        if (!response.ok) throw new Error('Failed to send campaign');
         addToast(`✅ API Campaign completed!`, 'success');
       } else {
         // Open WhatsApp links with delay

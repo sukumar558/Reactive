@@ -4,38 +4,58 @@
  */
 
 const FEEDBACK_TEMPLATES = [
-  `Namaste {name} ji! 🙏 Aapne 15 din pehle {item} liya tha. Kaisa chal raha hai? 😊 Agar koi problem ho toh batayein, aur agar accha laga toh review zaroor dein!`,
-  `Hi {name} ji! Aapka {item} use karte hue 2 hafte ho gaye hain. Hope everything is great! 👍 Ek chota feedback mil sakta hai kya? Hamare liye bohot zaroori hai.`,
-  `Hello {name} ji! 👋 Kaise hain aap? Aapke {item} ke baare mein jaana tha — experience kaisa hai? Hum hamesha help ke liye ready hain. Review ke liye reply karein!`,
+  `Hello {name}! 👋 It has been 15 days since you purchased your {item}. How is it performing? 😊 Please let us know if you need any assistance, or leave us a review if you are happy with the service!`,
+  `Hi {name}! You have been using your {item} for two weeks now. We hope everything is going well! 👍 Could we get a quick piece of feedback? It helps us improve our service for you.`,
+  `Hello {name}! 👋 We are checking in to see how your experience with the {item} has been so far. We are always here to help. Please reply to share your feedback or leave a review!`,
 ];
 
 const SERVICE_TEMPLATES = [
-  `Namaste {name} ji! 🙏 Aapne {months} mahine pehle {item} liya tha hamare yahan se. Ab service ka time aa gaya hai. Aaj hi booking karwa dein toh aapka {item} bilkul naye jaisa chalega! Reply karein ya call karein. 📞`,
-  `{name} ji, kaise hain aap? 😊 Aapke {item} ko {months} mahine ho gaye hain. Expert service se performance aur badhegi. Kya aaj slot book karein aapke liye? Hum ghar pe service bhi dete hain! 🏠`,
-  `Hello {name} ji! Aapka {item} ka {months} month service due hai. Timely service se product ki life double hoti hai! 💪 Special offer: Is week book karein toh 10% discount milega. Interested? 🎉`,
+  `Hello {name}! 🙏 It has been {months} months since you purchased your {item} from us. It is now time for a routine service. Book your slot today to keep your {item} running like new! Reply or call us to schedule. 📞`,
+  `Hi {name}, how are you? 😊 Your {item} has reached its {months}-month milestone. A professional service will ensure peak performance. Shall we book a maintenance slot for you today? We also offer home service for your convenience! 🏠`,
+  `Hello {name}! Your {item} is due for its {months}-month service. Timely maintenance can significantly extend the life of your product! 💪 Special offer: Book this week for a 10% discount. Interested? 🎉`,
 ];
 
 const UPGRADE_TEMPLATES = [
-  `{name} ji! 🚀 Aapne {months} mahine pehle {item} liya tha. Ab market mein naye models aa gaye hain with amazing features! Exchange offer bhi available hai. Dekhne aaiye na shop pe? 😊`,
-  `Namaste {name} ji! Aapke {item} ko {months} mahine ho gaye. Naya model launch hua hai — better performance, kam bijli, zyada features! 🌟 Purane {item} pe accha exchange value milega. Interest hai?`,
-  `{name} ji, aapka {item} ab {months} months purana ho gaya hai. Latest version mein 40% zyada efficiency hai! 📊 Special upgrade offer: purana dein, naya lein + easy EMI available. Baat karein? 💬`,
+  `Hi {name}! 🚀 It has been {months} months since you bought your {item}. New models with advanced features have just arrived! We have some great exchange offers available — why not visit the shop to take a look? 😊`,
+  `Hello {name}! Your {item} is now {months} months old. We have just launched new models with better performance, lower power consumption, and more features! 🌟 We can offer a great trade-in value for your current {item}. Interested?`,
+  `Hi {name}, your {item} is now {months} months old. The latest version offers 40% more efficiency! 📊 Special upgrade offer: Trade in your old device for the new one + easy monthly payments available. Would you like to discuss? 💬`,
 ];
 
 const UPSELL_TEMPLATES = [
-  `Hi {name} ji! 👋 Aapke {item} ke saath ye accessories use karenge toh experience aur bhi amazing hoga! Hamare paas compatible accessories available hain. Dekhenge? 🛍️`,
-  `{name} ji, kaise hain? 😊 Aapne {months} mahine pehle {item} liya tha. Kuch customers ne matching accessories liye — unki feedback bohot acchi hai! Aapke liye special price rakhenge. Interest hai?`,
-  `Namaste {name} ji! Aapke {item} ke liye premium accessories aa gaye hain. ✨ Original quality, warranty ke saath. Ye use karenge toh {item} ki life bhi badhegi. Details bhejein? 📱`,
+  `Hi {name}! 👋 Enhancing your {item} with the right accessories can make your experience even better! We have a range of compatible accessories in stock. Would you like to see them? 🛍️`,
+  `Hello {name}! 😊 It has been {months} months since you purchased your {item}. Many customers who bought this also love our matching accessories — the feedback has been excellent! We can offer you a special price. Interested?`,
+  `Hi {name}! We have just received premium accessories for your {item}. ✨ Original quality with full warranty. These will help protect your device and extend its lifespan. Shall I send you the details? 📱`,
 ];
 
 const WARRANTY_TEMPLATES = [
-  `⚠️ {name} ji! Important update: Aapke {item} ki warranty {months} mahine mein expire ho rahi hai. Extended warranty le lein toh tension free rahenge. Details chahiye? 🛡️`,
-  `{name} ji, ye zaroori message hai. Aapke {item} ki factory warranty jaldi expire hogi. Extended warranty plan sirf ₹{price}/year mein available hai. Secure kar lein? 🔒`,
-  `Hello {name} ji! Aapke {item} ki warranty period complete hone wala hai. Warranty khatam hone se pehle free checkup karwa lein aur extended plan dekhein. Kab aayen shop pe? 📅`,
+  `⚠️ Hi {name}! Important update: The warranty for your {item} is set to expire in {months} months. You can extend your warranty now for total peace of mind. Would you like the details? 🛡️`,
+  `Hello {name}, this is an important reminder. The factory warranty for your {item} will expire soon. You can secure an extended warranty plan for just ₹{price}/year. Protect your investment today? 🔒`,
+  `Hi {name}! The warranty period for your {item} is almost complete. We recommend a final free check-up before it expires and perhaps looking at an extension. When can you drop by the shop? 📅`,
+];
+
+const SERVICE_DUE_TEMPLATES = [
+  `Namaste {name} ji! 🙏 Aapke {item} ki urgent service due hai. Performance optimize karne ke liye aaj hi check karwayein. 🛠️`,
+  `Hello {name} ji! Reminder: Aapka {item} service milestone cross kar chuka hai. Please visit for a quick checkup! ✨`,
+];
+
+const REACTIVATION_TEMPLATES = [
+  `Namaste {name} ji! 👋 Bahut time ho gaya aap se mile. Kaise hain aap? Hamare paas {item} के naye model aur offers aaye hain. Ek baar shop visit kijiye na! 😊`,
+  `Hi {name} ji! We miss you at Smart Choice. Aapne long time pehle {item} liya tha. Aapke liye ek special 'Welcome Back' discount ready hai! 🎁`,
+];
+
+const VIP_OFFER_TEMPLATES = [
+  `Congratulations {name} ji! 🎉 Aap hamare VIP customer hain. Aapke {item} ke liye exclusive 20% OFF coupon code: VIP20. ✨ 💎`,
+  `Namaste {name} ji! Aap hamare loyal customer hain isliye aapko priority access mil raha hai hamari new collection pe. 🌟`,
+];
+
+const FESTIVAL_TEMPLATES = [
+  `Smart Choice ki taraf se aapko aur aapke parivaar ko Tyohar ki dheron shubhkamnayein! 🪔 Iss festive season, {item} upgrade pe payein bumper cashbacks! 🎆`,
+  `Happy Festival {name} ji! 🎈 Khushiyon ke mausam mein, shop pe special deals chal rahi hain for our {item} owners. 🛍️`,
 ];
 
 const CUSTOM_TEMPLATES = [
-  `Namaste {name} ji! 🙏 {message}`,
-  `Hi {name} ji! {message}. Reply karein ya call karein. 📞`,
+  `Hello {name}! 🙏 {message}`,
+  `Hi {name}! {message}. Please reply or call us for more information. 📞`,
 ];
 
 /**
@@ -48,6 +68,10 @@ function getRandomTemplate(type) {
     upgrade: UPGRADE_TEMPLATES,
     upsell: UPSELL_TEMPLATES,
     warranty_expiry: WARRANTY_TEMPLATES,
+    service_due: SERVICE_DUE_TEMPLATES,
+    reactivation: REACTIVATION_TEMPLATES,
+    vip_offer: VIP_OFFER_TEMPLATES,
+    festival: FESTIVAL_TEMPLATES,
     custom: CUSTOM_TEMPLATES
   };
 

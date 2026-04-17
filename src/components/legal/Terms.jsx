@@ -34,7 +34,7 @@ export default function Terms({ onBack }) {
       </div>
 
       <footer className="landing-footer">
-        <p>&copy; 2026 ReActivate AI. Built for Smart Bharat.</p>
+        <p>&copy; 2026 ReActivate AI. Built for Smart Retail.</p>
       </footer>
     </div>
   );

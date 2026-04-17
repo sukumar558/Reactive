@@ -44,58 +44,35 @@ serve(async (req: Request) => {
 
     const { data: profile, error: profileError } = await supabaseClient
       .from('ra_profiles')
-      .select('whatsapp_cloud_token, whatsapp_phone_id')
+      .select('id, whatsapp_cloud_token, whatsapp_phone_id')
       .eq('id', user.id)
       .single();
 
-    if (profileError || !profile?.whatsapp_cloud_token || !profile?.whatsapp_phone_id) {
-      throw new Error('WhatsApp API credentials missing. Please set them in Integrations.');
-    }
+    if (profileError || !profile) throw new Error('Profile not found');
 
     const payload: MessagePayload = await req.json();
-    if (!payload.messages || !Array.isArray(payload.messages)) {
-      throw new Error('Invalid payload. Expected an array of messages.');
-    }
+    const campaignId = req.headers.get('x-campaign-id'); // Optional link
 
-    const results = [];
+    // Insert all messages into the queue for background processing
+    const queueEntries = payload.messages.map(msg => ({
+      user_id: profile.id,
+      campaign_id: campaignId || null,
+      phone: msg.phone,
+      message: msg.body,
+      status: 'pending',
+      scheduled_at: new Date().toISOString()
+    }));
 
-    // Send messages sequentially to Meta API
-    for (const msg of payload.messages) {
-      try {
-        const response = await fetch(
-          `https://graph.facebook.com/v18.0/${profile.whatsapp_phone_id}/messages`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${profile.whatsapp_cloud_token}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              messaging_product: "whatsapp",
-              to: msg.phone,
-              type: "text",
-              text: { body: msg.body },
-            })
-          }
-        );
+    const { error: queueError } = await supabaseClient
+      .from('message_queue')
+      .insert(queueEntries);
 
-        const metaResult: MetaResponse = await response.json();
-        
-        results.push({
-          phone: msg.phone,
-          success: response.ok,
-          metaId: metaResult.messages?.[0]?.id || null,
-          error: response.ok ? null : (metaResult.error?.message || 'Unknown Meta API error')
-        });
-      } catch (e: any) {
-        results.push({ phone: msg.phone, success: false, error: e.message });
-      }
-    }
+    if (queueError) throw queueError;
 
     return new Response(JSON.stringify({
       success: true,
-      processed: results.length,
-      results
+      queued: queueEntries.length,
+      message: "Messages added to background queue for reliable delivery."
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
