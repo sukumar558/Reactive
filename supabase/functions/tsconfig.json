@@ -2,14 +2,23 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "lib": ["ESNext", "DOM"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
-    "checkJs": true
+    "checkJs": true,
+    "baseUrl": ".",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "paths": {
+      "std/*": ["https://deno.land/std@0.177.0/*"],
+      "supabase-js": ["https://esm.sh/@supabase/supabase-js@2.12.1"]
+    },
+    "types": ["./deno.d.ts"]
   },
+
   "include": ["**/*.ts"]
 }

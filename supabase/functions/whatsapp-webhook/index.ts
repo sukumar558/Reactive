@@ -56,7 +56,7 @@ serve(async (req: Request) => {
 
         // Find which profile this belongs to using phone_number_id
         const { data: profile } = await supabaseAdmin
-          .from('ra_profiles')
+          .from('profiles')
           .select('id')
           .eq('whatsapp_phone_id', metadata.phone_number_id)
           .single()
@@ -65,7 +65,7 @@ serve(async (req: Request) => {
           // Find customer by phone (cleaning number)
           const cleanPhone = from.replace(/\D/g, '')
           const { data: customer } = await supabaseAdmin
-            .from('ra_customers')
+            .from('customers')
             .select('id')
             .eq('user_id', profile.id)
             .ilike('phone', `%${cleanPhone.slice(-10)}%`)
@@ -73,15 +73,19 @@ serve(async (req: Request) => {
 
           // Log the message
           await supabaseAdmin
-            .from('ra_inbound_messages')
+            .from('activity_logs')
             .insert({
               user_id: profile.id,
-              customer_id: customer?.id || null,
-              from_phone: from,
-              message_body: body,
-              message_type: message.type,
-              provider_message_id: messageId,
-              metadata: { full_payload: payload }
+              type: 'inbound_message',
+              action: `Message from ${from}`,
+              meta: {
+                customer_id: customer?.id || null,
+                from_phone: from,
+                message_body: body,
+                message_type: message.type,
+                provider_message_id: messageId,
+                full_payload: payload
+              }
             })
           
           console.log(`Log saved for ${from}: ${body}`)

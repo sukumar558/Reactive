@@ -162,7 +162,7 @@ export default function AuthPage({ addToast }) {
   async function checkProfile(user) {
     if (!user) return;
     const { data: profile } = await supabase
-      .from('ra_profiles')
+      .from('profiles')
       .select('id, shop_name')
       .eq('id', user.id)
       .single();
@@ -187,15 +187,12 @@ export default function AuthPage({ addToast }) {
     const { data: { user } } = await supabase.auth.getUser();
 
     const { error } = await supabase
-      .from('ra_profiles')
+      .from('profiles')
       .upsert({
         id: user.id,
         owner_name: name,
         shop_name: shopName,
-        business_type: businessType || 'General',
-        avg_order_value: 1000,
-        automation_active: false,
-        api_mode_enabled: false,
+        plan: 'free',
       });
 
     if (error) {

@@ -1,6 +1,6 @@
 import { useApp } from '../App';
 import { supabase } from '../supabaseClient';
-import { LayoutDashboard, Upload, Users, Zap, Send, History, LogOut, Settings } from 'lucide-react';
+import { LayoutDashboard, Upload, Users, Zap, Send, History, LogOut, Rocket } from 'lucide-react';
 
 const NAV_ITEMS = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { id: 'triggers', label: 'Smart Triggers', icon: Zap },
   { id: 'campaign', label: 'Campaign', icon: Send },
   { id: 'history', label: 'History', icon: History },
-  { id: 'integrations', label: 'Integrations', icon: Settings },
+  { id: 'integrations', label: 'Get Started', icon: Rocket },
 ];
 
 export default function Sidebar({ currentPage, setCurrentPage }) {
@@ -26,7 +26,7 @@ export default function Sidebar({ currentPage, setCurrentPage }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <h1>⚡ ReActivate AI</h1>
+        <h1>⚡ Wrappers</h1>
         <span>WhatsApp CRM</span>
       </div>
 

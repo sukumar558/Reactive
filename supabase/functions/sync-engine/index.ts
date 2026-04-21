@@ -1,8 +1,9 @@
 /// <reference path="../deno.d.ts" />
 // @ts-ignore: Deno standard library
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "std/http/server.ts";
 // @ts-ignore: Supabase ESM
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "supabase-js";
+import { detectProduct } from "../_shared/productIntelligence.ts";
 // @ts-ignore: XLSX ESM
 import * as XLSX from "https://esm.sh/xlsx";
 
@@ -19,7 +20,7 @@ interface CustomerPayload {
   user_id: string;
   name: string;
   phone: string;
-  item: string;
+  item_name: string;
   purchase_date: string;
   category: string;
   payment_mode: string;
@@ -89,23 +90,32 @@ serve(async (req: Request) => {
             }
             seen.add(key);
 
+            const product = detectProduct(payload.item_name || '');
+            
             valid.push({
               user_id: source.user_id,
               name: payload.name,
               phone: phone,
-              item: payload.item || '',
+              item_name: payload.item_name || '',
+              clean_item_name: product.category === 'General' ? (payload.item_name || '') : `${product.brand} ${product.category}`,
+              raw_item_name: payload.item_name || '',
               purchase_date: d.toISOString().split('T')[0],
-              category: payload.category || 'General',
+              category: product.category,
+              brand: product.brand,
+              upgrade_cycle_months: product.upgrade_cycle_months,
+              needs_review: product.category === 'General',
+              confidence_score: product.category === 'General' ? 40 : 90,
               payment_mode: 'Live Sync',
               sync_source: source.source_type
-            });
+            } as any);
+
           }
         });
 
         if (valid.length > 0) {
           const { data: inserted, error: upsertError } = await supabaseClient
             .from('customers')
-            .upsert(valid, { onConflict: 'phone,item,purchase_date', ignoreDuplicates: true })
+            .upsert(valid, { onConflict: 'user_id,phone', ignoreDuplicates: true })
             .select('id');
 
           if (upsertError) throw upsertError;

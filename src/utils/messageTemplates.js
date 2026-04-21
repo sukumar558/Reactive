@@ -1,139 +1,185 @@
 /**
- * AI-Style Message Templates (Hinglish)
- * Personalized message generation without external API
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  RE-ACTIVATE AI: PROFESSIONAL CRM MESSAGE REPOSITORY          ║
+ * ║  25 Strategic Triggers • 3 Variations Each • Premium Tone    ║
+ * ╚══════════════════════════════════════════════════════════════╝
  */
 
-const FEEDBACK_TEMPLATES = [
-  `Hello {name}! 👋 It has been 15 days since you purchased your {item}. How is it performing? 😊 Please let us know if you need any assistance, or leave us a review if you are happy with the service!`,
-  `Hi {name}! You have been using your {item} for two weeks now. We hope everything is going well! 👍 Could we get a quick piece of feedback? It helps us improve our service for you.`,
-  `Hello {name}! 👋 We are checking in to see how your experience with the {item} has been so far. We are always here to help. Please reply to share your feedback or leave a review!`,
-];
+const TEMPLATES = {
+  // 1. PERSONAL & URGENT
+  birthday_today: [
+    "Namaste {name} ji! 🙏 Janamdin ki dheron shubhkamnayein! 🎂 Aap hamare bohot valued customer hain. Aapke birthday ko special banane ke liye hamare paas ek surprise gift ready hai. Store visit karein? ✨",
+    "Hello {name} ji! 👋 Happy Birthday! 🎉 Humne notice kiya aaj aapka birthday hai. Aap jaise loyal customers ke liye humne ek special surprise reserve kiya hai. Kab aa rahe hain gift lene? 🎁",
+    "Janamdin Mubarak {name} ji! 🎂 Is special occasion par aapke liye ek exclusive 'Birthday Reward' unlock hua hai. Detail chahiye? 🌟"
+  ],
+  service_due: [
+    "Namaste {name} ji! 🙏 Aapke {item} ki best performance ke liye service due hai. 🔧 Timely service se life badhti hai aur repairs ka kharcha bachta hai. Slot book karein? 📞",
+    "Hello {name} ji! ⏰ Reminder: Aapka {item} service ke liye due hai. Early maintenance se reliability bani rehti hai. Kab visit karenge? 🛠️",
+    "Hi {name} ji! 👋 Aapka {item} hamare liye important hai. Smooth running ke liye scheduled maintenance zaroori hai. Aaj hi appointment lein! 🔧"
+  ],
+  warranty_expiry: [
+    "⚠️ {name} ji! Aapke {item} ki warranty sirf {days} din mein expire ho rahi hai. Extended warranty le lein toh tension-free rahenge! 🛡️ Details chahiye?",
+    "Hello {name} ji! Important: {item} ki factory warranty khatam hone wali hai. Pehle free checkup karwa lein. Kab aayen? 🔒",
+    "Hi {name} ji! 😰 Warranty expire hone se pehle action lein — security pe koi compromise nahi! Details bhejein?"
+  ],
+  complaint_recovery: [
+    "Dear {name} ji, pichli baar hamari service best nahi rahi. 🙏 Hum sincerely sorry hain. Aapka trust wapas earn karne ke liye humne aapke liye ek special care package ready kiya hai. 🩹",
+    "Hello {name} ji! 🙏 We value your feedback. Aapki pichli complaint ke baad humne improvements ki hain. Aapke next visit par 30% OFF as an apology. 🩹",
+    "Namaste {name} ji! ✨ Ek mauka aur dein? Hum aapka experience sudharna chahte hain. Special apology gift aapke account mein add ho gaya hai. 🎁"
+  ],
+  vip_milestone: [
+    "👑 Congratulations {name} ji! Aap hamare Super VIP customer hain. ₹{amount}+ ka trust dikhane ke liye shukriya! ✨ Aapke liye priority service card ready hai. 💎",
+    "Namaste {name} ji! 🏆 Elite Status Update: Aap top 5% shoppers mein se hain. Exclusive early access aur premium gifts ke liye store visit karein! 🎁",
+    "Hello {name} ji! 🔥 Your loyalty is unmatched. VIP members ke liye is month priority home delivery aur extra bonus points hain. 💎"
+  ],
 
-const SERVICE_TEMPLATES = [
-  `Hello {name}! 🙏 It has been {months} months since you purchased your {item} from us. It is now time for a routine service. Book your slot today to keep your {item} running like new! Reply or call us to schedule. 📞`,
-  `Hi {name}, how are you? 😊 Your {item} has reached its {months}-month milestone. A professional service will ensure peak performance. Shall we book a maintenance slot for you today? We also offer home service for your convenience! 🏠`,
-  `Hello {name}! Your {item} is due for its {months}-month service. Timely maintenance can significantly extend the life of your product! 💪 Special offer: Book this week for a 10% discount. Interested? 🎉`,
-];
+  // 2. POST-PURCHASE LOOP
+  satisfaction_check: [
+    "Hi {name} ji! 😊 Aapne recently {item} liya tha. Kaisa chal raha hai? Humein umeed hai aapka experience accha hoga. Koi help chahiye toh batayein! ⭐",
+    "Hello {name} ji! 👋 Just checking in. Aapka naya {item} kaisa perform kar raha hai? Hum hamesha help ke liye available hain. 👍",
+    "Namaste {name} ji! ✨ Aapke new {item} ka experience kaisa raha? Aapka feedback hamare liye bohot valuable hai. 🙏"
+  ],
+  upgrade_opportunity: [
+    "🚀 {name} ji! Aapka {item} ab upgrade ke liye perfect hai! Naye models mein advanced features aur exchange bonus ready hai. 📱 Details dein?",
+    "Hello {name} ji! ✨ Upgrade ka sahi time aa gaya! Aapke {item} ke badle naya model lein with Easy EMI aur bumper exchange offers. 🌟",
+    "Hi {name} ji! 📈 Tech ka maza latest version mein hai! Aapka {item} exchange karke upgrade karne pe special ₹2000 discount sirf aaj! 📱"
+  ],
+  first_repeat_nudge: [
+    "🔁 Hello {name} ji! {item} kaisa chal raha hai? Hum aapki next purchase pe special 15% discount de rahe hain! Second order = Extra savings 🎉",
+    "Hi {name} ji! 👋 Thank you for choosing us. Aapke doosre visit pe ek surprise gift hamari taraf se ready hai! Kab aa rahe hain? 🛍️",
+    "Namaste {name} ji! ✨ First experience accha raha? Next shopping pe double reward points payein. Shop now! 🔁"
+  ],
+  accessory_upsell: [
+    "Hi {name} ji! 😊 {item} ke liye matching accessories store pe aa gaye hain. Aapke purchase ke saath special combo discounts hain! 🛍️ Dekhein?",
+    "Hello {name} ji! ✨ Apne {item} ko aur behtar banayein! Protective gear aur style accessories ki nayi range aa gayi hai. 📱",
+    "Namaste {name} ji! 👋 {item} ke liye curated list of accessories ready hai. Aapke liye special add-on offer available hai. ✨"
+  ],
+  bulk_loyalty: [
+    "📦 {name} ji! Aap hamare frequent buyer hain. Bulk orders pe ab wholesale rates aur priority checkout aapke liye active hai! 🏆",
+    "Hello {name} ji! Frequent shopping ke liye thank you! 📦 Aapke liye special bulk-pricing catalog ready hai. Details bhejein? ⭐",
+    "Namaste {name} ji! 🔥 Bulk Buyer Status unlocked! Next ₹{amount} se zyada shopping pe free home delivery guaranteed. 📦"
+  ],
 
-const UPGRADE_TEMPLATES = [
-  `Hi {name}! 🚀 It has been {months} months since you bought your {item}. New models with advanced features have just arrived! We have some great exchange offers available — why not visit the shop to take a look? 😊`,
-  `Hello {name}! Your {item} is now {months} months old. We have just launched new models with better performance, lower power consumption, and more features! 🌟 We can offer a great trade-in value for your current {item}. Interested?`,
-  `Hi {name}, your {item} is now {months} months old. The latest version offers 40% more efficiency! 📊 Special upgrade offer: Trade in your old device for the new one + easy monthly payments available. Would you like to discuss? 💬`,
-];
+  // 3. RETENTION & REACTIVATION
+  dormancy_90d: [
+    "Namaste {name} ji! 👋 Bahut samay ho gaya aapse mile. Humne miss kiya! 😊 Welcome Back voucher aapke account mein add ho gaya hai. Visit karein? 🎁",
+    "Hi {name} ji! 😟 We miss seeing you! Aap hamare valued customer hain, isliye aapke next visit par guaranteed benefits ready hain. 🎁",
+    "Hello {name} ji! 👋 Aapke bina store adhoora lag raha hai. Aapke liye ek special return offer design kiya hai. Visit kijiye na! 😊"
+  ],
+  win_back_180d: [
+    "🔄 {name} ji! 6 mahine ho gaye! Aapke purane loyalty points expire hone wale hain. ⏳ Inhe aaj hi use karein aur flat 30% OFF payein!",
+    "Hello {name} ji! Ek surprise: Aapka favorite product ab stock mein hai with a win-back discount! Ek mauka aur dein? 🔄",
+    "Hi {name} ji! ⏳ Final Attempt: Hum aapke purane reward points ko reset hone se bachana chahte hain. Inhe use karne ke liye aaj hi visit karein! 🛒"
+  ],
+  high_value_dormant: [
+    "Namaste {name} ji! 😟 Bahut time ho gaya. Aap hamare ₹{amount}+ ke valued customer hain. Special high-value return gift sirf aapke liye! 🎁",
+    "Hi {name} ji! We miss you! Aapke taste ke liye naya premium range aaya hai. Valued customer discount valid till Sunday! ⏳",
+    "Hello {name} ji! ✨ Special recognition: Aapke liye personal shopping experience humne book kiya hai. Kab aayenge? 💎"
+  ],
+  referral_request: [
+    "🤝 {name} ji! Aap hamare satisfied customers mein se hain. Friends ko refer karein, aur dono ko ₹500 voucher payein! 🎁",
+    "Hi {name} ji! Sharing is caring! 🤝 Refer karna easy hai — aur benefits double! App check karein details ke liye. 📲",
+    "Namaste {name} ji! ✨ Aapka trust hamare liye sab kuch hai. Apne circle mein recommend karein aur referral rewards enjoy karein! 🤝"
+  ],
+  festival_special: [
+    "🪔 {name} ji! Tyohar ki shubhkamnayein! Is festive season mein bumper cashback aur free gifts! 🎆 Check out the deals!",
+    "Happy Festival {name} ji! 🎈 Badi deals, bade dhamake! Is seasonal sale mein exclusive vouchers sirf hamare customers ke liye. 🛍️",
+    "Namaste {name} ji! 🎉 Festival pe naya {item} lene ka best time hai. Zero-downpayment EMI offers available! 🪔"
+  ],
 
-const UPSELL_TEMPLATES = [
-  `Hi {name}! 👋 Enhancing your {item} with the right accessories can make your experience even better! We have a range of compatible accessories in stock. Would you like to see them? 🛍️`,
-  `Hello {name}! 😊 It has been {months} months since you purchased your {item}. Many customers who bought this also love our matching accessories — the feedback has been excellent! We can offer you a special price. Interested?`,
-  `Hi {name}! We have just received premium accessories for your {item}. ✨ Original quality with full warranty. These will help protect your device and extend its lifespan. Shall I send you the details? 📱`,
-];
-
-const WARRANTY_TEMPLATES = [
-  `⚠️ Hi {name}! Important update: The warranty for your {item} is set to expire in {months} months. You can extend your warranty now for total peace of mind. Would you like the details? 🛡️`,
-  `Hello {name}, this is an important reminder. The factory warranty for your {item} will expire soon. You can secure an extended warranty plan for just ₹{price}/year. Protect your investment today? 🔒`,
-  `Hi {name}! The warranty period for your {item} is almost complete. We recommend a final free check-up before it expires and perhaps looking at an extension. When can you drop by the shop? 📅`,
-];
-
-const SERVICE_DUE_TEMPLATES = [
-  `Namaste {name} ji! 🙏 Aapke {item} ki urgent service due hai. Performance optimize karne ke liye aaj hi check karwayein. 🛠️`,
-  `Hello {name} ji! Reminder: Aapka {item} service milestone cross kar chuka hai. Please visit for a quick checkup! ✨`,
-];
-
-const REACTIVATION_TEMPLATES = [
-  `Namaste {name} ji! 👋 Bahut time ho gaya aap se mile. Kaise hain aap? Hamare paas {item} के naye model aur offers aaye hain. Ek baar shop visit kijiye na! 😊`,
-  `Hi {name} ji! We miss you at Smart Choice. Aapne long time pehle {item} liya tha. Aapke liye ek special 'Welcome Back' discount ready hai! 🎁`,
-];
-
-const VIP_OFFER_TEMPLATES = [
-  `Congratulations {name} ji! 🎉 Aap hamare VIP customer hain. Aapke {item} ke liye exclusive 20% OFF coupon code: VIP20. ✨ 💎`,
-  `Namaste {name} ji! Aap hamare loyal customer hain isliye aapko priority access mil raha hai hamari new collection pe. 🌟`,
-];
-
-const FESTIVAL_TEMPLATES = [
-  `Smart Choice ki taraf se aapko aur aapke parivaar ko Tyohar ki dheron shubhkamnayein! 🪔 Iss festive season, {item} upgrade pe payein bumper cashbacks! 🎆`,
-  `Happy Festival {name} ji! 🎈 Khushiyon ke mausam mein, shop pe special deals chal rahi hain for our {item} owners. 🛍️`,
-];
-
-const CUSTOM_TEMPLATES = [
-  `Hello {name}! 🙏 {message}`,
-  `Hi {name}! {message}. Please reply or call us for more information. 📞`,
-];
+  // 4. BEHAVIORAL
+  fast_buyer_reward: [
+    "⚡ {name} ji! Waah! Back-to-back purchases! Aap hamare Fast Buyer hain — extra bonus points reward points mein add ho gaye! 🎯",
+    "Hi {name} ji! Itni jaldi doosri shopping! Reward: Aapke next visit par accessories pe flat 50% OFF! 🎁",
+    "Hello {name} ji! ⚡ You are on fire! Fast shoppers ke liye special surprise gift store pe ready hai. Collect kijiye! ✨"
+  ],
+  category_expert: [
+    "🏅 {name} ji! Humne notice kiya aap {category} category ke fan hain! Naye stock pe early access sirf select fans ke liye. 🌟",
+    "Hi {name} ji! Aapka taste {category} mein behtareen hai. Humne aapke liye kuch special arrivals shortlist kiye hain. ✨",
+    "Namaste {name} ji! 🏅 Category Expert update: Aapke collection ko upgrade karne ke liye naye gadgets aa gaye hain! 🛍️"
+  ],
+  seasonal_shopper: [
+    "📅 {name} ji! Har saal is waqt aap visit karte hain. Is saal ki seasonal deals pehle se better hain! Miss mat kijiye. 🕐",
+    "Hi {name} ji! Aapka favorite shopping month aa gaya! 📅 Humne aapke history ke basis pe deals ready ki hain. Dekhein? ⏰",
+    "Namaste {name} ji! ✨ Seasonal match found! Early bird offer sirf 24 hours ke liye. Grab it now! 🕐"
+  ],
+  budget_smart: [
+    "💸 {name} ji! Budget shopping is smart shopping! Humne aapke liye deals under ₹4999 shortlist ki hain. Best quality at best price! 🏷️",
+    "Hi {name} ji! Savings ka mahina! Quality products ab budget prices mein. Stock khatam hone se pehle visit karein! 💰",
+    "Namaste {name} ji! 💸 Value-for-money deals sirf hamare customers ke liye. Check out budget store section! 🏷️"
+  ],
+  premium_taste: [
+    "⬆️ {name} ji! Aapka taste premium hai. Latest flagship models ke liye exclusive demo aur private preview available hai. 💎",
+    "Hi {name} ji! Quality over quantity — we know your style. Nayi luxury range ke liye pre-booking start ho gayi hai. 🌟",
+    "Namaste {name} ji! ✨ Luxury range updates: Signature collection ab sirf select stores par. Early access link niche hai. 💰"
+  ],
+  no_response_last: [
+    "📭 {name} ji! Humne pehle messages bheje the, shayad aap busy the. Help chahiye toh bas 'REPLY' karein — we are listening! 🔔",
+    "Hello {name} ji! No pressure, bas ek check-in message. Agar hum koi help kar sakte hain toh batayein! 💬",
+    "Hi {name} ji! 📭 Just a friendly nudge. Hum hamesha service ke liye ready hain. Kuch sawal hai toh puchiye! 📲"
+  ],
+  hot_lead_nudge: [
+    "🔥 {name} ji! Aapne products dekhe but decision nahi liya. Flat 10% instant discount sirf aapke liye to help you decide! 🎯",
+    "Hi {name} ji! 🔥 Products are flying off the shelves! Apne selection ko secure karein humare special offer ke saath. ⏳",
+    "Hello {name} ji! 🚀 Decide karne ka best time hai! Limited stock aur heavy discounts — don't miss out! 🎯"
+  ],
+  last_visit_touch: [
+    "🏪 {name} ji! Shop visit karne ke liye shukriya. Humein khushi hogi agar hum aapki shopping aur easy bana sakein! 👋",
+    "Hi {name} ji! Kal aap store pe aaye the, thanks! Hope you liked the collection. Next visit pe tea hamari taraf se! ☕",
+    "Hello {name} ji! 👋 Visit ke baad kuch dimaag mein reh gaya? Help chahiye toh bas ek message kijiye! ✨"
+  ],
+  abandoned_cart: [
+    "🛒 {name} ji! Aapka cart intezar kar raha hai. In products pe abhi bhi special price available hai. Checkout karein? 🛍️",
+    "Hi {name} ji! 🛒 Almost Yours! Complete your purchase now and get a surprise accessory for free! 🎁",
+    "Hello {name} ji! 🛒 Don't leave your favorites behind! Flat ₹500 discount for completing your cart today. ⏳"
+  ],
+  general_news: [
+    "✨ {name} ji! Kuch naya? Humne shop ko refresh kiya hai with latest electronics. Visit and explore! 👋",
+    "Hi {name} ji! 🆕 New Arrivals alert! Electronics ki duniya mein naya kya hai? Store pe check karein! 🌟",
+    "Namaste {name} ji! ✨ Stay ahead of tech trends! Weekly new items arrived. See you at the shop! 🛍️"
+  ]
+};
 
 /**
- * Get random template for a trigger type
+ * Get a random template for a campaign type
  */
-function getRandomTemplate(type) {
-  const templates = {
-    feedback: FEEDBACK_TEMPLATES,
-    service_reminder: SERVICE_TEMPLATES,
-    upgrade: UPGRADE_TEMPLATES,
-    upsell: UPSELL_TEMPLATES,
-    warranty_expiry: WARRANTY_TEMPLATES,
-    service_due: SERVICE_DUE_TEMPLATES,
-    reactivation: REACTIVATION_TEMPLATES,
-    vip_offer: VIP_OFFER_TEMPLATES,
-    festival: FESTIVAL_TEMPLATES,
-    custom: CUSTOM_TEMPLATES
-  };
-
-  const list = templates[type] || CUSTOM_TEMPLATES;
+export function getRandomTemplate(type) {
+  const list = TEMPLATES[type] || TEMPLATES.general_news;
   return list[Math.floor(Math.random() * list.length)];
 }
 
 /**
  * Generate a personalized message for a customer
  */
-export function generateMessage(customer, triggerType, customMessage = '') {
+export function generateMessage(customer, triggerType) {
   const template = getRandomTemplate(triggerType);
-  const purchaseDate = new Date(customer.purchase_date);
+  const purchaseDate = new Date(customer.purchase_date || new Date());
   const now = new Date();
-  const diffTime = Math.abs(now - purchaseDate);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  const months = Math.floor(
-    (now.getFullYear() - purchaseDate.getFullYear()) * 12 +
-    (now.getMonth() - purchaseDate.getMonth())
-  );
+  
+  const diffDays = customer.days_since_last_purchase || 0;
+  const months = customer.product_age_months || 0;
 
-  const message = template
-    .replace(/{name}/g, customer.name)
-    .replace(/{item}/g, customer.item)
+  return template
+    .replace(/{name}/g, customer.name || 'Customer')
+    .replace(/{item}/g, customer.item_name || 'product')
     .replace(/{months}/g, months.toString())
     .replace(/{days}/g, diffDays.toString())
-    .replace(/{price}/g, '999')
-    .replace(/{message}/g, customMessage);
-
-  return message;
+    .replace(/{brand}/g, customer.brand || 'brand')
+    .replace(/{amount}/g, (customer.total_spend || 0).toLocaleString())
+    .replace(/{category}/g, customer.category || 'electronics');
 }
 
 /**
- * Generate messages for a batch of customers
- */
-export function generateBulkMessages(customers, triggerType) {
-  return customers.map(customer => ({
-    customer,
-    message: generateMessage(customer, triggerType),
-    triggerType
-  }));
-}
-
-/**
- * Generate WhatsApp link for a message
+ * Generate WhatsApp link
  */
 export function getWhatsAppLink(phone, message) {
-  // Clean phone number - remove spaces, dashes, etc
   let cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-  
-  // Add India country code if not present
   if (!cleanPhone.startsWith('+')) {
-    if (cleanPhone.startsWith('0')) {
-      cleanPhone = '+91' + cleanPhone.substring(1);
-    } else if (!cleanPhone.startsWith('91')) {
-      cleanPhone = '+91' + cleanPhone;
-    } else {
-      cleanPhone = '+' + cleanPhone;
-    }
+    if (cleanPhone.startsWith('0')) cleanPhone = '+91' + cleanPhone.substring(1);
+    else if (!cleanPhone.startsWith('91')) cleanPhone = '+91' + cleanPhone;
+    else cleanPhone = '+' + cleanPhone;
   }
-
   return `https://wa.me/${cleanPhone.replace('+', '')}?text=${encodeURIComponent(message)}`;
 }
 
-export { FEEDBACK_TEMPLATES, SERVICE_TEMPLATES, UPGRADE_TEMPLATES, UPSELL_TEMPLATES, WARRANTY_TEMPLATES };
+export { TEMPLATES };

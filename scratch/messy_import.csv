@@ -1,0 +1,6 @@
+item,purchase_date,name,phone
+Samsung S23,2026-04-18,Ravi Kumar,9876543210
+Google Pixel,2026-04-18,John Doe,1234567890
+extra1,name,extra2,phone,extra3,item,purchase_date
+abc,Alice Smith,xyz,9988776655,123,Laptop,2026-04-18
+Bad,Row,,,Missing,Columns,2026-04-18

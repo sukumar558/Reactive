@@ -40,7 +40,7 @@ serve(async (req: Request) => {
       if (lines.length === 0) continue;
       
       const numCols = lines[0].length;
-      const scores = Array.from({ length: numCols }, () => ({ phone: 0, date: 0, name: 0, item: 0, category: 0, spent: 0 }));
+      const scores = Array.from({ length: numCols }, () => ({ phone: 0, date: 0, name: 0, item_name: 0, category: 0, spent: 0 }));
 
       // 🔍 Score Content (Sample first 10 rows)
       const sample = lines.slice(0, 10);
@@ -62,7 +62,7 @@ serve(async (req: Request) => {
           
           // Category vs Item
           if (clean.length > 2 && clean.length < 15) scores[i].category += 1;
-          if (clean.length >= 15 || (words.length > 1 && !/^[a-zA-Z\s.]+$/.test(clean))) scores[i].item += 1;
+          if (clean.length >= 15 || (words.length > 1 && !/^[a-zA-Z\s.]+$/.test(clean))) scores[i].item_name += 1;
 
           // Total Spent: Numeric with optional currency/decimals
           if (/^[\d,.]+$/.test(clean.replace(/[^\d,.]/g, '')) && parseFloat(clean.replace(/[^\d.]/g, '')) > 0) scores[i].spent += 1;
@@ -79,7 +79,7 @@ serve(async (req: Request) => {
       const phoneIdx = getBestIdx('phone');
       const nameIdx = getBestIdx('name');
       const dateIdx = getBestIdx('date');
-      const itemIdx = getBestIdx('item');
+      const itemIdx = getBestIdx('item_name');
       const categoryIdx = getBestIdx('category');
       const spentIdx = getBestIdx('spent');
 
@@ -87,7 +87,7 @@ serve(async (req: Request) => {
       stats.mappings[profile.id] = {
         name: nameIdx !== -1 ? `Col ${nameIdx + 1}` : 'Not Found',
         phone: phoneIdx !== -1 ? `Col ${phoneIdx + 1}` : 'Not Found',
-        item: itemIdx !== -1 ? `Col ${itemIdx + 1}` : 'Not Found',
+        item_name: itemIdx !== -1 ? `Col ${itemIdx + 1}` : 'Not Found',
         purchase_date: dateIdx !== -1 ? `Col ${dateIdx + 1}` : 'Not Found',
         total_spent: spentIdx !== -1 ? `Col ${spentIdx + 1}` : 'Not Found'
       };
@@ -116,7 +116,7 @@ serve(async (req: Request) => {
           user_id: profile.id,
           name: nameIdx !== -1 ? row[nameIdx] : 'Guest',
           phone: cleanPhone,
-          item: itemIdx !== -1 ? row[itemIdx] : 'Unknown',
+          item_name: itemIdx !== -1 ? row[itemIdx] : 'Unknown',
           purchase_date: dateIdx !== -1 ? new Date(row[dateIdx]).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
           total_spent: spentIdx !== -1 ? parseFloat(row[spentIdx].replace(/[^\d.]/g, '')) || 0 : 0,
           category: categoryIdx !== -1 ? row[categoryIdx] : null,

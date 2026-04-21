@@ -34,7 +34,7 @@ serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-    
+
     const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: req.headers.get('Authorization')! } }
     });
@@ -43,7 +43,7 @@ serve(async (req: Request) => {
     if (authError || !user) throw new Error('Unauthorized');
 
     const { data: profile, error: profileError } = await supabaseClient
-      .from('ra_profiles')
+      .from('profiles')
       .select('id, whatsapp_cloud_token, whatsapp_phone_id')
       .eq('id', user.id)
       .single();

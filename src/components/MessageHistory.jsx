@@ -16,8 +16,8 @@ export default function MessageHistory() {
     }
 
     const { data, error } = await supabase
-      .from('ra_campaign_customers')
-      .select('*, ra_customers(*)')
+      .from('customer_campaigns')
+      .select('*, customers(*)')
       .eq('campaign_id', campaignId);
 
     if (!error && data) {
@@ -28,7 +28,7 @@ export default function MessageHistory() {
 
   async function deleteCampaign(id) {
     if (!confirm('Delete this campaign? This cannot be undone.')) return;
-    const { error } = await supabase.from('ra_campaigns').delete().eq('id', id);
+    const { error } = await supabase.from('campaigns').delete().eq('id', id);
     if (error) {
       addToast('Delete failed: ' + error.message, 'error');
     } else {
@@ -48,10 +48,10 @@ export default function MessageHistory() {
     if (!value) return;
     
     const { error } = await supabase
-      .from('ra_campaign_customers')
+      .from('customer_campaigns')
       .update({ 
-        is_converted: true, 
-        sale_value: parseFloat(value) 
+        converted_at: new Date().toISOString(), 
+        revenue_generated: parseFloat(value) 
       })
       .eq('id', id);
 
@@ -63,7 +63,7 @@ export default function MessageHistory() {
       setCampaignDetails(prev => {
         const details = [...(prev[campaignId] || [])];
         const idx = details.findIndex(cc => cc.id === id);
-        if (idx !== -1) details[idx] = { ...details[idx], is_converted: true, sale_value: parseFloat(value) };
+        if (idx !== -1) details[idx] = { ...details[idx], converted_at: new Date().toISOString(), revenue_generated: parseFloat(value) };
         return { ...prev, [campaignId]: details };
       });
     }
@@ -97,18 +97,18 @@ export default function MessageHistory() {
                 onClick={() => loadCampaignCustomers(campaign.id)}
               >
                 <div>
-                  <h3 style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: 4 }}>{campaign.title}</h3>
+                  <h3 style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: 4 }}>{campaign.campaign_name}</h3>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                    <span className="badge badge-blue">{triggerLabels[campaign.trigger_type] || campaign.trigger_type}</span>
-                    <span className={`badge ${campaign.status === 'completed' ? 'badge-green' : 'badge-yellow'}`}>
-                      {campaign.status}
+                    <span className="badge badge-blue">Priority {campaign.priority}</span>
+                    <span className={`badge ${campaign.is_active ? 'badge-green' : 'badge-yellow'}`}>
+                      {campaign.is_active ? 'Active' : 'Inactive'}
                     </span>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                       <Clock size={12} />
-                      {campaign.sent_at ? new Date(campaign.sent_at).toLocaleString('en-IN') : 'Not sent'}
+                      {new Date(campaign.created_at).toLocaleString('en-IN')}
                     </span>
                     <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                      📤 {campaign.sent_count}/{campaign.total_customers} sent
+                      📤 {campaign.customer_campaigns?.length || 0} customers
                     </span>
                   </div>
                 </div>
@@ -134,9 +134,9 @@ export default function MessageHistory() {
                     }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                         <div>
-                          <span style={{ fontWeight: 600 }}>{cc.ra_customers?.name || 'Unknown'}</span>
+                          <span style={{ fontWeight: 600 }}>{cc.customers?.name || 'Unknown'}</span>
                           <span style={{ color: 'var(--text-muted)', marginLeft: 10, fontSize: '0.82rem' }}>
-                            📱 {cc.ra_customers?.phone}
+                            📱 {cc.customers?.phone}
                           </span>
                         </div>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -153,9 +153,9 @@ export default function MessageHistory() {
                              cc.status === 'opted_out' ? '🚫 Opted Out' : cc.status}
                           </span>
                           
-                          {cc.is_converted ? (
+                          {cc.converted_at ? (
                             <span className="badge badge-green" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                              💰 Converted (₹{cc.sale_value})
+                              💰 Converted (₹{cc.revenue_generated})
                             </span>
                           ) : (
                             <button className="btn btn-sm btn-primary" onClick={() => markConverted(cc.id, campaign.id)}>
@@ -163,13 +163,13 @@ export default function MessageHistory() {
                             </button>
                           )}
                           <button className="btn btn-sm btn-secondary" style={{ padding: '4px 8px' }} 
-                            onClick={() => resendMessage(cc.ra_customers?.phone, cc.personalized_message)}>
+                            onClick={() => resendMessage(cc.customers?.phone, cc.reason)}>
                             <RotateCcw size={12} />
                           </button>
                         </div>
                       </div>
                       <div className="message-preview" style={{ fontSize: '0.82rem', padding: 14 }}>
-                        {cc.personalized_message}
+                        {cc.reason}
                       </div>
                     </div>
                   ))}

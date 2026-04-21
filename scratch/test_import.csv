@@ -1,0 +1,6 @@
+name,phone,item,purchase_date
+Ravi Kumar,9876543210,iPhone,2025-10-15
+Ravi Kumar,9876543210,Samsung S23,2026-04-18
+John Doe,1234567890,Google Pixel,2026-04-18
+Jane Smith,,OnePlus 12,2026-04-18
+,,Bad Row,2026-04-18

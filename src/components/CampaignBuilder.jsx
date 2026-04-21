@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../App';
 import { supabase } from '../supabaseClient';
 import { generateMessage, getWhatsAppLink } from '../utils/messageTemplates';
 import { TRIGGER_RULES } from '../utils/triggerLogic';
-import { Send, Check, X, Edit, RefreshCw, ExternalLink, Zap } from 'lucide-react';
+import { findRule } from '../utils/triggerLogic';
+import { Send, Check, X, Edit, RefreshCw, ExternalLink, Zap, Shield } from 'lucide-react';
 
 export default function CampaignBuilder() {
   const {
@@ -22,8 +23,8 @@ export default function CampaignBuilder() {
 
   // Sync with global selections
   useEffect(() => {
-    if (selectedCustomers.length > 0) {
-      setLocalSelected(selectedCustomers.map(c => c.id));
+    if (selectedCustomers && selectedCustomers.length > 0) {
+      setLocalSelected(selectedCustomers.filter(c => c).map(c => c.id));
     }
   }, [selectedCustomers]);
 
@@ -50,7 +51,7 @@ export default function CampaignBuilder() {
   }
 
   function generateMessages() {
-    const msgs = activeCustomers.map(customer => ({
+    const msgs = activeCustomers.filter(c => c).map(customer => ({
       customer,
       message: generateMessage(customer, triggerType),
       status: 'pending',
@@ -102,53 +103,82 @@ export default function CampaignBuilder() {
     setSending(true);
 
     try {
+      // ── EXCLUSIVE GUARD: Check for customers already in active campaigns ──
+      const customerIds = approved.map(m => m.customer.id);
+      
+      // Fetch active campaign memberships for these customers
+      const { data: activeMemberships } = await supabase
+        .from('customer_campaigns')
+        .select('customer_id')
+        .in('customer_id', customerIds)
+        .in('status', ['assigned', 'sent']);
+
+      const alreadyAssigned = new Set(
+        (activeMemberships || []).map(m => m.customer_id)
+      );
+
+      // Filter out customers already in active campaigns
+      const eligible = approved.filter(m => !alreadyAssigned.has(m.customer.id));
+      const blockedCount = approved.length - eligible.length;
+
+      if (blockedCount > 0) {
+        addToast(`⚠️ ${blockedCount} customer(s) already in active campaigns — skipped`, 'warning');
+      }
+
+      if (eligible.length === 0) {
+        addToast('All selected customers are already in active campaigns', 'error');
+        setSending(false);
+        return;
+      }
+
       // 1. Create campaign in DB
       const { data: campaign, error: campError } = await supabase
-        .from('ra_campaigns')
+        .from('campaigns')
         .insert({
           user_id: session.user.id,
-          title: campaignTitle,
-          trigger_type: triggerType,
-          campaign_type: 'manual',
-          message_template: approved[0]?.message?.substring(0, 200),
-          status: 'completed',
-          total_customers: approved.length,
-          sent_count: approved.length,
-          sent_at: new Date().toISOString(),
+          campaign_name: campaignTitle,
+          priority: 1,
+          message_template: eligible[0]?.message?.substring(0, 200),
+          is_active: true,
         })
         .select()
         .single();
 
       if (campError) throw new Error(campError.message);
 
-      // 2. Save campaign customers & history
-      const campaignCustomers = approved.map(m => ({
+      // 2. Save customer_campaigns
+      const campaignCustomers = eligible.map(m => ({
+        user_id: session.user.id,
         campaign_id: campaign.id,
         customer_id: m.customer.id,
-        personalized_message: m.message,
+        reason: m.message.substring(0, 200),
+        score: 0,
         status: 'sent',
         sent_at: new Date().toISOString(),
       }));
 
-      await supabase.from('ra_campaign_customers').insert(campaignCustomers);
+      await supabase.from('customer_campaigns').insert(campaignCustomers);
 
-      const historyRows = approved.map(m => ({
+      // 3. Queue messages for delivery
+      const queueRows = eligible.map(m => ({
         user_id: session.user.id,
         customer_id: m.customer.id,
         campaign_id: campaign.id,
+        phone: m.customer.phone,
         message: m.message,
-        trigger_type: triggerType,
+        provider: 'whatsapp',
+        status: 'sent',
         sent_at: new Date().toISOString(),
       }));
 
-      await supabase.from('ra_message_history').insert(historyRows);
+      await supabase.from('message_queue').insert(queueRows);
 
-      // 3. Update customer last contact date
-      const customerIds = approved.map(m => m.customer.id);
+      // 4. Update customer last_purchase_date as a touch point
+      const eligibleIds = eligible.map(m => m.customer.id);
       await supabase
-        .from('ra_customers')
-        .update({ last_contact_date: new Date().toISOString() })
-        .in('id', customerIds);
+        .from('customers')
+        .update({ updated_at: new Date().toISOString() })
+        .in('id', eligibleIds);
 
       // 4. Send Messages (API vs Manual)
       if (profile?.api_mode_enabled) {
@@ -162,7 +192,7 @@ export default function CampaignBuilder() {
             'x-campaign-id': campaign.id
           },
           body: JSON.stringify({
-            messages: approved.map(m => ({
+            messages: eligible.map(m => ({
               phone: m.customer.phone,
               body: m.message
             }))
@@ -173,13 +203,15 @@ export default function CampaignBuilder() {
         addToast(`✅ API Campaign completed!`, 'success');
       } else {
         // Open WhatsApp links with delay
-        for (let i = 0; i < approved.length; i++) {
-          const link = getWhatsAppLink(approved[i].customer.phone, approved[i].message);
+        for (let i = 0; i < eligible.length; i++) {
+          const cust = eligible[i].customer;
+          if (!cust?.phone) continue;
+          const link = getWhatsAppLink(cust.phone, eligible[i].message);
           setTimeout(() => {
             window.open(link, '_blank');
           }, i * 2000);
         }
-        addToast(`🎉 Opening ${approved.length} WhatsApp links...`, 'success');
+        addToast(`🎉 Opening ${eligible.length} WhatsApp links...`, 'success');
       }
 
       setStep(3);
@@ -240,17 +272,28 @@ export default function CampaignBuilder() {
           {activeCustomers.length > 0 ? (
             <>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 12 }}>
-                <Zap size={14} style={{ verticalAlign: -2 }} /> {activeCustomers.length} customers selected from Smart Triggers
+                <Zap size={14} style={{ verticalAlign: -2 }} /> {activeCustomers.length} customers selected from AI Intelligence
               </p>
-              {activeCustomers.slice(0, 10).map(c => (
-                <div key={c.id} className="customer-check selected">
-                  <input type="checkbox" checked readOnly />
-                  <div className="customer-check-info">
-                    <div className="customer-check-name">{c.name}</div>
-                    <div className="customer-check-detail">{c.item} • {c.phone} • Purchased: {new Date(c.purchase_date).toLocaleDateString('en-IN')}</div>
+              {activeCustomers.slice(0, 10).map(c => {
+                const rule = findRule(triggerType);
+                return (
+                  <div key={c.id} className="customer-check selected">
+                    <input type="checkbox" checked readOnly />
+                    <div className="customer-check-info">
+                      <div className="customer-check-name">
+                        {c.name}
+                        {rule && (
+                          <span style={{ fontSize: '0.65rem', marginLeft: 8, padding: '1px 6px', borderRadius: 4, background: `${rule.color}20`, color: rule.color, fontWeight: 600 }}>
+                            {rule.icon} P{rule.priority}
+                          </span>
+                        )}
+                      </div>
+                      <div className="customer-check-detail">{c.item_name} • {c.phone} • {c.purchase_date ? new Date(c.purchase_date).toLocaleDateString('en-IN') : '—'}</div>
+                      {rule && <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: 2 }}>💡 {rule.description}</div>}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {activeCustomers.length > 10 && (
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: 8 }}>
                   +{activeCustomers.length - 10} more customers
@@ -271,7 +314,7 @@ export default function CampaignBuilder() {
                   <input type="checkbox" checked={localSelected.includes(c.id)} readOnly />
                   <div className="customer-check-info">
                     <div className="customer-check-name">{c.name}</div>
-                    <div className="customer-check-detail">{c.item} • {c.phone}</div>
+                    <div className="customer-check-detail">{c.item_name} • {c.phone}</div>
                   </div>
                 </div>
               ))}

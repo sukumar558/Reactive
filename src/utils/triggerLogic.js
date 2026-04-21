@@ -1,200 +1,47 @@
 /**
- * Smart Trigger Engine
- * Calculates which customers need follow-up based on purchase date
+ * TRIGGER_RULES — Static campaign metadata lookup table.
+ * 
+ * All campaign LOGIC now lives in the SQL view `active_campaign_targets`.
+ * This file only provides UI metadata (label, icon, color, priority)
+ * used by Dashboard, TriggerEngine, and CustomerList for display.
  */
 
-const TRIGGER_RULES = [
-  {
-    type: 'feedback',
-    label: 'Feedback & Review',
-    icon: '⭐',
-    days: 15,
-    color: '#10b981',
-    description: 'Collect feedback 15 days after purchase'
-  },
-  {
-    type: 'service_reminder',
-    label: 'Service Due',
-    icon: '🔧',
-    months: 6,
-    color: '#f59e0b',
-    description: 'Service reminder for products purchased 6+ months ago'
-  },
-  {
-    type: 'upsell',
-    label: 'Accessories Upsell',
-    icon: '🛍️',
-    months: 3,
-    color: '#8b5cf6',
-    description: 'Suggest accessories for products purchased 3+ months ago'
-  },
-  {
-    type: 'warranty_expiry',
-    label: 'Warranty Expiring',
-    icon: '🛡️',
-    months: 11,
-    color: '#ef4444',
-    description: 'Warranty expiring for products purchased 11+ months ago'
-  },
-  {
-    type: 'upgrade',
-    label: 'Upgrade Suggestion',
-    icon: '🚀',
-    months: 12,
-    color: '#06b6d4',
-    description: 'Suggest upgrade for products purchased 12+ months ago'
-  },
-  {
-    type: 'reactivation',
-    label: 'Reactivation',
-    icon: '👋',
-    months: 18,
-    color: '#6366f1',
-    description: 'Re-engage customers after 1.5 years'
-  },
-  {
-    type: 'vip_offer',
-    label: 'VIP Offer',
-    icon: '💎',
-    months: 9,
-    color: '#d946ef',
-    description: 'Exclusive reward for loyal customers'
-  },
-  {
-    type: 'festival',
-    label: 'Festival Special',
-    icon: '🎉',
-    months: 0,
-    color: '#f97316',
-    description: 'Seasonal/Festival greetings and offers'
-  },
-  {
-    type: 'service_due',
-    label: 'Service Due',
-    icon: '🛠️',
-    months: 10,
-    color: '#f59e0b',
-    description: 'Urgent service reminder (10 months)'
-  }
+export const TRIGGER_RULES = [
+  // --- PRIORITY 1-5: CRITICAL RETENTION ---
+  { type: 'birthday_today', label: 'Birthday Wish', icon: '🎂', priority: 1, color: '#ec4899', description: 'Send heartfelt birthday greetings' },
+  { type: 'win_back_180d', label: 'Win-Back Offer', icon: '🔄', priority: 2, color: '#4f46e5', description: 'Re-engage long-dormant low-spend customers' },
+  { type: 'complaint_recovery', label: 'Trust Recovery', icon: '🩹', priority: 3, color: '#dc2626', description: 'Recover trust after complaints' },
+  { type: 'warranty_expiry', label: 'Warranty End', icon: '🛡️', priority: 4, color: '#ef4444', description: 'Alert before warranty expires' },
+  { type: 'vip_milestone', label: 'VIP Recognition', icon: '💎', priority: 5, color: '#8b5cf6', description: 'Reward top spenders (₹80K+)' },
+
+  // --- PRIORITY 6-10: SERVICE & RETENTION ---
+  { type: 'service_due', label: 'Service Reminder', icon: '🔧', priority: 6, color: '#f59e0b', description: 'Prompt service for mid-spend 1-2yr customers' },
+  { type: 'satisfaction_check', label: '7-Day Feedback', icon: '⭐', priority: 7, color: '#10b981', description: 'Check satisfaction 7-10 days post-purchase' },
+  { type: 'upgrade_opportunity', label: 'Tech Upgrade', icon: '🚀', priority: 8, color: '#06b6d4', description: 'Upgrade offer for 2+yr mid-high spenders' },
+  { type: 'dormancy_90d', label: '90-Day Re-entry', icon: '👋', priority: 9, color: '#6366f1', description: 'Re-engage 90-365 day dormant customers' },
+  { type: 'bulk_loyalty', label: 'Bulk Buyer Reward', icon: '📦', priority: 10, color: '#14b8a6', description: 'Reward customers with 5+ purchases' },
+
+  // --- PRIORITY 11-25: GROWTH & NUDGES ---
+  { type: 'first_repeat_nudge', label: 'Second Order Nudge', icon: '🔁', priority: 11, color: '#22c55e', description: 'Nudge single-purchase low-spend customers' },
+  { type: 'accessory_upsell', label: 'Add-on Nudge', icon: '🛍️', priority: 12, color: '#3b82f6', description: 'Cross-sell accessories within 14 days' },
+  { type: 'high_value_dormant', label: 'HV Dormant', icon: '💤', priority: 13, color: '#f97316', description: 'Re-engage high-value 1-2yr dormant customers' },
+  { type: 'referral_request', label: 'Referral Program', icon: '🤝', priority: 14, color: '#059669', description: 'Ask loyal customers for referrals' },
+  { type: 'festival_special', label: 'Festival Offer', icon: '🎉', priority: 15, color: '#ea580c', description: 'Festive season offers (Oct/Nov)' },
+  { type: 'fast_buyer_reward', label: 'Fast Buyer', icon: '⚡', priority: 16, color: '#eab308', description: 'Reward quick repeat buyers' },
+  { type: 'category_expert', label: 'Category Loyal', icon: '🏅', priority: 17, color: '#f43f5e', description: 'Engage category-loyal customers' },
+  { type: 'seasonal_shopper', label: 'Seasonal Match', icon: '📅', priority: 18, color: '#84cc16', description: 'Target seasonal buying patterns' },
+  { type: 'budget_smart', label: 'Budget Deals', icon: '💸', priority: 19, color: '#d97706', description: 'Budget-friendly deals for low spenders' },
+  { type: 'premium_taste', label: 'Luxury Range', icon: '✨', priority: 20, color: '#7c3aed', description: 'Premium offerings for high-AOV customers' },
+  { type: 'no_response_last', label: 'Silence Breaker', icon: '📭', priority: 21, color: '#94a3b8', description: 'Gentle nudge for non-responders' },
+  { type: 'hot_lead_nudge', label: 'Hot Prospect', icon: '🔥', priority: 22, color: '#dc2626', description: 'Convert frequent visitors into buyers' },
+  { type: 'last_visit_touch', label: 'Recent Visit', icon: '🏪', priority: 23, color: '#4b5563', description: 'Follow up after recent visit' },
+  { type: 'abandoned_cart', label: 'Nearly Yours', icon: '🛒', priority: 24, color: '#f87171', description: 'Recover abandoned carts' },
+  { type: 'general_news', label: 'New Arrivals', icon: '✨', priority: 25, color: '#9ca3af', description: 'General updates and new products' }
 ];
 
 /**
- * Calculate the number of months between two dates
+ * Quick lookup helper — find a rule by its trigger code
  */
-function monthsDiff(dateFrom, dateTo) {
-  const from = new Date(dateFrom);
-  const to = new Date(dateTo);
-  return (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
+export function findRule(triggerCode) {
+  return TRIGGER_RULES.find(r => r.type === triggerCode) || null;
 }
-
-/**
- * Calculate days until a trigger date
- */
-function daysUntilTrigger(purchaseDate, rule) {
-  const trigger = new Date(purchaseDate);
-  if (rule.days) {
-    trigger.setDate(trigger.getDate() + rule.days);
-  } else {
-    trigger.setMonth(trigger.getMonth() + (rule.months || 0));
-  }
-  const now = new Date();
-  const diffTime = trigger.getTime() - now.getTime();
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-}
-
-/**
- * Get urgency level for a customer trigger
- */
-function getUrgency(daysRemaining) {
-  if (daysRemaining <= 0) return { level: 'overdue', label: 'Overdue', color: '#ef4444', emoji: '🔴' };
-  if (daysRemaining <= 7) return { level: 'due_soon', label: 'Due Soon', color: '#f59e0b', emoji: '🟡' };
-  if (daysRemaining <= 30) return { level: 'upcoming', label: 'Upcoming', color: '#22c55e', emoji: '🟢' };
-  return { level: 'future', label: 'Future', color: '#6b7280', emoji: '⚪' };
-}
-
-/**
- * Analyze a single customer and return all applicable triggers
- */
-export function analyzeCustomer(customer) {
-  const now = new Date();
-  const purchaseDate = new Date(customer.purchase_date);
-  const monthsSincePurchase = monthsDiff(purchaseDate, now);
-
-  const triggers = [];
-
-  for (const rule of TRIGGER_RULES) {
-    const daysRemaining = daysUntilTrigger(customer.purchase_date, rule);
-    const urgency = getUrgency(daysRemaining);
-
-    // Include triggers that are overdue, due soon, or upcoming (within 30 days)
-    if (daysRemaining <= 30) {
-      triggers.push({
-        ...rule,
-        daysRemaining,
-        urgency,
-        monthsSincePurchase,
-        isActive: true
-      });
-    }
-  }
-
-  // Sort by urgency (overdue first)
-  triggers.sort((a, b) => a.daysRemaining - b.daysRemaining);
-
-  return triggers;
-}
-
-/**
- * Batch analyze all customers and group by trigger type
- */
-export function analyzeAllCustomers(customers) {
-  const results = {
-    feedback: [],
-    service_reminder: [],
-    upsell: [],
-    warranty_expiry: [],
-    upgrade: [],
-    reactivation: [],
-    vip_offer: [],
-    festival: [],
-    service_due: [],
-    all: []
-  };
-
-  for (const customer of customers) {
-    const triggers = analyzeCustomer(customer);
-    for (const trigger of triggers) {
-      const entry = { customer, trigger };
-      results[trigger.type].push(entry);
-      results.all.push(entry);
-    }
-  }
-
-  // Sort each group by urgency
-  for (const key of Object.keys(results)) {
-    results[key].sort((a, b) => a.trigger.daysRemaining - b.trigger.daysRemaining);
-  }
-
-  return results;
-}
-
-/**
- * Get dashboard stats from trigger analysis
- */
-export function getDashboardStats(triggerResults) {
-  return {
-    totalOverdue: triggerResults.all.filter(r => r.trigger.urgency.level === 'overdue').length,
-    totalDueSoon: triggerResults.all.filter(r => r.trigger.urgency.level === 'due_soon').length,
-    totalUpcoming: triggerResults.all.filter(r => r.trigger.urgency.level === 'upcoming').length,
-    serviceCount: triggerResults.service_reminder.length,
-    upsellCount: triggerResults.upsell.length,
-    warrantyCount: triggerResults.warranty_expiry.length,
-    upgradeCount: triggerResults.upgrade.length,
-    feedbackCount: triggerResults.feedback.length,
-    reactivationCount: triggerResults.reactivation.length,
-    vipCount: triggerResults.vip_offer.length,
-    total: triggerResults.all.length
-  };
-}
-
-export { TRIGGER_RULES, monthsDiff, daysUntilTrigger, getUrgency };

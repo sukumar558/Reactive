@@ -13,6 +13,8 @@ serve(async (req: Request) => {
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
   // 1. Atomically claim pending jobs
   // This uses 'FOR UPDATE SKIP LOCKED' via a Postgres function
   const { data: jobs, error } = await supabase
@@ -26,7 +28,7 @@ serve(async (req: Request) => {
   // 2. Fetch profiles for the claimed jobs manually (as RPC doesn't join)
   const userIds = [...new Set(jobs?.map((j: any) => j.user_id))];
   const { data: profiles } = await supabase
-    .from('ra_profiles')
+    .from('profiles')
     .select('id, whatsapp_cloud_token, whatsapp_phone_id')
     .in('id', userIds);
 
@@ -36,7 +38,7 @@ serve(async (req: Request) => {
     // Sync 'processing' status to dashboard immediately
     if (job.campaign_id && job.customer_id) {
       await supabase
-        .from("ra_campaign_customers")
+        .from("customer_campaigns")
         .update({ status: "processing" })
         .eq("campaign_id", job.campaign_id)
         .eq("customer_id", job.customer_id);
@@ -69,21 +71,31 @@ serve(async (req: Request) => {
       const payload = await res.json();
       if (!res.ok) throw new Error(payload.error?.message || "WhatsApp API failure");
 
-      // Stage 3: 'delivered'
+      // Stage 3: 'sent'
+      const providerMsgId = payload.messages?.[0]?.id || null;
       await supabase
         .from("message_queue")
         .update({
-          status: "delivered",
-          processed_at: new Date().toISOString(),
-          provider_message_id: payload.messages?.[0]?.id || null
+          status: "sent",
+          provider_message_id: providerMsgId,
+          delivery_status: "sent",
+          sent_at: new Date().toISOString(),
+          provider_response: JSON.stringify(payload)
         })
         .eq("id", job.id);
 
+      // Audit Log
+      await supabase.from("message_status_history").insert({
+        message_id: job.id,
+        status: "sent",
+        provider_raw: payload
+      });
+
       if (job.campaign_id && job.customer_id) {
         await supabase
-          .from("ra_campaign_customers")
+          .from("customer_campaigns")
           .update({ 
-            status: "delivered",
+            status: "sent",
             sent_at: new Date().toISOString()
           })
           .eq("campaign_id", job.campaign_id)
@@ -104,8 +116,8 @@ serve(async (req: Request) => {
         .from("message_queue")
         .update({
           status: nextStatus,
-          attempts,
-          error_text: String(e.message),
+          retry_count: attempts,
+          provider_response: String(e.message),
           scheduled_at: isPermanent ? null : new Date(Date.now() + 5 * 60000).toISOString()
         })
         .eq("id", job.id);
@@ -113,7 +125,7 @@ serve(async (req: Request) => {
       // Sync status back to dashboard
       if (job.campaign_id && job.customer_id) {
         await supabase
-          .from("ra_campaign_customers")
+          .from("customer_campaigns")
           .update({ status: nextStatus })
           .eq("campaign_id", job.campaign_id)
           .eq("customer_id", job.customer_id);
